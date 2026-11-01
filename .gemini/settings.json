@@ -1,4 +1,7 @@
 {
+  "context": {
+    "fileName": ["AGENTS.md", "GEMINI.md"]
+  },
   "mcpServers": {
     "xano": {
       "command": "npx",
