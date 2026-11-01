@@ -14,4 +14,5 @@ table "mensalista" {
     {type: "primary", field: [{name: "id"}]}
     {type: "btree", field: [{name: "status"}]}
   ]
+  guid = "9MZskSWJiGf0K0PEpZeG2X5aozI"
 }

@@ -12,4 +12,5 @@ table "vaga" {
     {type: "btree|unique", field: [{name: "number"}]}
     {type: "btree", field: [{name: "status"}]}
   ]
+  guid = "KaZfa_uMsHh9xYRZkVoGH8Owego"
 }

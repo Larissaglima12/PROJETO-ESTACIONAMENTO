@@ -1,10 +1,10 @@
 {
   "servers": {
     "xano": {
-      "command": "C:/Program Files/nodejs/node.exe",
+      "command": "npx",
       "args": [
-        "C:/Users/prima/AppData/Roaming/npm/node_modules/@xano/developer-mcp/dist/index.js",
-        "--stdio"
+        "-y",
+        "@xano/developer-mcp"
       ]
     }
   }

@@ -32,4 +32,5 @@ table "movimentacao" {
     {type: "btree", field: [{name: "usuario_id"}]}
     {type: "btree", field: [{name: "entry_time", op: "desc"}]}
   ]
+  guid = "xMduFiYO65GsXuKGU36i8h7OtwQ"
 }

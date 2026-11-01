@@ -17,4 +17,5 @@ table "veiculo" {
     {type: "btree|unique", field: [{name: "plate"}]}
     {type: "btree", field: [{name: "mensalista_id"}]}
   ]
+  guid = "tih54v3AwkdF-eInK1TzeJZN3rY"
 }
