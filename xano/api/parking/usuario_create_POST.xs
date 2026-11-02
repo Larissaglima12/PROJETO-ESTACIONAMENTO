@@ -1,5 +1,6 @@
 query "usuario" verb=POST {
   api_group = "Estacionamento"
+  auth = "usuario"
   input {
     text name filters=trim
     email email filters=trim|lower
@@ -7,6 +8,16 @@ query "usuario" verb=POST {
     text type
   }
   stack {
+    db.get usuario {
+      field_name = "id"
+      field_value = $auth.id
+    } as $current_user
+
+    precondition ($current_user != null && $current_user.type == "admin") {
+      error_type = "accessdenied"
+      error = "Admin access required"
+    }
+
     db.add usuario {
       data = {
         name: $input.name
