@@ -4,11 +4,11 @@ query "vaga/ocupacao" verb=GET {
   }
   stack {
     db.query vaga {
-      where = [{field: "status", op: "=", value: "livre"}]
+      where = $db.vaga.status == "livre"
       return = {type: "count"}
     } as $livres
     db.query vaga {
-      where = [{field: "status", op: "=", value: "ocupada"}]
+      where = $db.vaga.status == "ocupada"
       return = {type: "count"}
     } as $ocupadas
   }

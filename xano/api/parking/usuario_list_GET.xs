@@ -20,4 +20,5 @@ query "usuario" verb=GET {
     } as $usuarios
   }
   response = $usuarios
+  guid = "Yw0wWhRdBpu6BTsQaVyqCRJt0xE"
 }

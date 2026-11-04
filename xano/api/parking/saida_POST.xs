@@ -1,5 +1,6 @@
 query "parking/saida" verb=POST {
   api_group = "Estacionamento"
+  auth = "usuario"
   input {
     int movimentacao_id { table = "movimentacao" }
   }

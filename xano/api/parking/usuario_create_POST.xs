@@ -27,6 +27,12 @@ query "usuario" verb=POST {
       }
     } as $usuario
   }
-  response = $usuario
+
+  response = {
+    id: $usuario.id
+    name: $usuario.name
+    email: $usuario.email
+    type: $usuario.type
+  }
   guid = "mTF2B0UvPOYsSzj7bhJphjnWT38"
 }

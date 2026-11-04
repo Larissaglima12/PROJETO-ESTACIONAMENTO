@@ -1,16 +1,16 @@
 query "parking/entrada" verb=POST {
   api_group = "Estacionamento"
+  auth = "usuario"
   input {
     int veiculo_id { table = "veiculo" }
     int vaga_id { table = "vaga" }
-    int usuario_id { table = "usuario" }
   }
   stack {
     db.add movimentacao {
       data = {
         veiculo_id: $input.veiculo_id
         vaga_id: $input.vaga_id
-        usuario_id: $input.usuario_id
+        usuario_id: $auth.id
         entry_time: "now"
       }
     } as $mov
