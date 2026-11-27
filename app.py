@@ -599,32 +599,39 @@ else:
 
             movs_abertas, err_m = api_request("GET", "parking/movimentacao/abertas")
 
-            with st.form("saida_form"):
-                if err_m:
-                    st.error(f"Erro ao carregar movimentações: {err_m.get('message', 'Erro desconhecido.')}")
-                    mov_id = None
-                    m_plate = None
-                    m_vaga_number = None
-                    m_entry_time = None
-                elif not movs_abertas:
-                    st.info("Nenhum veículo estacionado no momento.")
-                    mov_id = None
-                    m_plate = None
-                    m_vaga_number = None
-                    m_entry_time = None
-                else:
-                    mov_options = {
-                        f"Placa: {m.get('plate')} | Vaga #{m.get('vaga_number')} (Entrada: {format_xano_timestamp(m.get('entry_time'))})": (
-                            m.get('movimentacao_id'),
-                            m.get('plate'),
-                            m.get('vaga_number'),
-                            m.get('entry_time')
-                        )
-                        for m in movs_abertas
-                    }
-                    selected_mov_label = st.selectbox("Selecione o Veículo Estacionado", list(mov_options.keys()))
-                    mov_id, m_plate, m_vaga_number, m_entry_time = mov_options[selected_mov_label]
+            if err_m:
+                st.error(f"Erro ao carregar movimentações: {err_m.get('message', 'Erro desconhecido.')}")
+                mov_id = None
+                m_plate = None
+                m_vaga_number = None
+                m_entry_time = None
+            elif not movs_abertas:
+                st.info("Nenhum veículo estacionado no momento.")
+                mov_id = None
+                m_plate = None
+                m_vaga_number = None
+                m_entry_time = None
+            else:
+                selected_mov_index = st.selectbox(
+                    "Selecione o Veículo Estacionado",
+                    range(len(movs_abertas)),
+                    format_func=lambda index: (
+                        f"Placa: {movs_abertas[index].get('plate')} | "
+                        f"Vaga #{movs_abertas[index].get('vaga_number')}"
+                    )
+                )
+                selected_movement = movs_abertas[selected_mov_index]
+                mov_id = selected_movement.get('movimentacao_id')
+                m_plate = selected_movement.get('plate')
+                m_vaga_number = selected_movement.get('vaga_number')
+                m_entry_time = selected_movement.get('entry_time')
+                st.info(
+                    f"**Movimentação selecionada**  \n"
+                    f"**Placa:** {m_plate or '—'} · **Vaga:** #{m_vaga_number or '—'}  \n"
+                    f"**Entrada:** {format_xano_timestamp(m_entry_time)}"
+                )
 
+            with st.form("saida_form"):
                 st.markdown("<br><br>", unsafe_allow_html=True)
                 submit_saida = st.form_submit_button("Registrar Saída", use_container_width=True)
 
