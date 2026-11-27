@@ -6,6 +6,7 @@ table "vaga" {
     int number
     enum type?="carro" { values = ["carro", "moto", "idoso", "deficiente"] }
     enum status?="livre" { values = ["livre", "ocupada", "manutencao"] }
+    bool active?=true
   }
   index = [
     {type: "primary", field: [{name: "id"}]}

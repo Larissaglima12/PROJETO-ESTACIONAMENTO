@@ -42,6 +42,8 @@ sistema, integração com cancelas ou câmeras.
 - Registro de entrada e de saída de veículos.
 - Painel de ocupação das vagas.
 - Cálculo do valor na saída.
+- Acompanhamento administrativo de faturamento, ticket médio e movimentações
+  finalizadas.
 
 ## 7. Requisitos e restrições
 
@@ -75,6 +77,11 @@ frontend da aplicação.
   segurança.
 - Tokens e senhas nunca são versionados.
 - Dados sensíveis (senha, e-mail) são tratados como sensíveis no Xano.
+- O endpoint financeiro, o gerenciamento de vagas e o gerenciamento de
+  usuários fazem verificações de perfil no backend.
+- Pendência identificada na auditoria: os endpoints de cadastro e listagem
+  de veículos e mensalistas não declaram autenticação. Portanto, o projeto
+  ainda não pode ser descrito como integralmente protegido no backend.
 
 ## 11. Estratégia de desenvolvimento
 
@@ -96,9 +103,9 @@ Valores de referência inspirados nos estacionamentos da Rua Cubatão
 (Paraíso/Vila Mariana, São Paulo). São parâmetros do projeto e podem
 ser ajustados.
 
-- Cobrança em frações de 15 minutos; hora de referência R$ 12,00
-  (R$ 3,00 por fração); até 15 minutos de permanência são gratuitos.
-- Teto de R$ 25,00 por movimentação.
+- Cobrança em frações de 15 minutos; hora de referência R$ 20,00
+  (R$ 5,00 por fração); até 10 minutos de permanência são gratuitos.
+- Teto de R$ 50,00 por movimentação.
 - Mensalista ativo e dentro da vigência: valor cobrado R$ 0,00 na saída.
   Mensalista inativo, suspenso ou vencido: tarifa avulsa.
 - Mensalidade de referência para dados de teste: R$ 280,00.

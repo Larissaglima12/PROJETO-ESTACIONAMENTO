@@ -17,7 +17,8 @@ veículo.
 - Registrar a entrada e a saída de veículos de forma confiável.
 - Mostrar a ocupação das vagas em tempo real.
 - Manter o cadastro de veículos e de mensalistas.
-- Calcular o valor a cobrar na saída (regra de cobrança a definir).
+- Calcular o valor a cobrar na saída conforme as regras de cobrança
+  implementadas no backend.
 
 ## 4. Usuários
 
@@ -96,12 +97,14 @@ Valores de referência inspirados nos estacionamentos da Rua Cubatão
 (Paraíso/Vila Mariana, São Paulo). São parâmetros do projeto e podem
 ser ajustados.
 
-- Cobrança em frações de 15 minutos; hora de referência R$ 12,00
-  (R$ 3,00 por fração); até 15 minutos de permanência são gratuitos.
-- Teto de R$ 25,00 por movimentação.
+- Cobrança em frações de 15 minutos; hora de referência R$ 20,00
+  (R$ 5,00 por fração); até 10 minutos de permanência são gratuitos.
+- Teto de R$ 50,00 por movimentação.
 - Mensalista ativo e dentro da vigência: valor cobrado R$ 0,00 na saída.
   Mensalista inativo, suspenso ou vencido: tarifa avulsa.
 - Mensalidade de referência para dados de teste: R$ 280,00.
+- Os valores acima correspondem à implementação atual em
+  `xano/api/parking/saida_POST.xs`.
 - Login obrigatório para operar; o usuário da movimentação vem do token
   de autenticação, não de um campo enviado pelo cliente.
 - O tipo da vaga não restringe o tipo do veículo nesta versão.

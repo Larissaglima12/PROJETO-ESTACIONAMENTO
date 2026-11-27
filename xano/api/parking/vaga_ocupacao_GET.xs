@@ -1,14 +1,15 @@
 query "vaga/ocupacao" verb=GET {
   api_group = "Estacionamento"
+  auth = "usuario"
   input {
   }
   stack {
     db.query vaga {
-      where = $db.vaga.status == "livre"
+      where = $db.vaga.active == true && $db.vaga.status == "livre"
       return = {type: "count"}
     } as $livres
     db.query vaga {
-      where = $db.vaga.status == "ocupada"
+      where = $db.vaga.active == true && $db.vaga.status == "ocupada"
       return = {type: "count"}
     } as $ocupadas
   }

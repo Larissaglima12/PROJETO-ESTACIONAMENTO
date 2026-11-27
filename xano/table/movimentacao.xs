@@ -24,6 +24,7 @@ table "movimentacao" {
     decimal? amount? filters=min:0 {
       description = "Valor cobrado"
     }
+    bool cancelled?=false
   }
   index = [
     {type: "primary", field: [{name: "id"}]}

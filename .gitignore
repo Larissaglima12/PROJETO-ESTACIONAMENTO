@@ -1,0 +1,26 @@
+# Python e ambientes locais
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Credenciais e configuração local
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.vscode/mcp.json
+.gemini/
+
+# Exportações e cópias temporárias do workspace
+temp_inspect/
+temp_verify_abertas/
+temp_verify_vaga/
+temp_mov_update/
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+
+.gemini/settings.json
+.vscode/mcp.json
