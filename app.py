@@ -196,6 +196,38 @@ def api_request(method, endpoint, json_data=None):
     except requests.exceptions.RequestException as e:
         return None, {"message": f"Erro de comunicação: {str(e)}"}
 
+def parse_xano_timestamp_utc(value):
+    if value is None or pd.isna(value):
+        return pd.NaT
+
+    timestamp = pd.to_numeric(value, errors='coerce')
+    if pd.notna(timestamp):
+        return pd.to_datetime(timestamp, unit='ms', errors='coerce', utc=True)
+
+    timestamp = pd.to_datetime(value, errors='coerce')
+    if pd.isna(timestamp):
+        return pd.NaT
+    if timestamp.tzinfo is None:
+        timestamp = timestamp.tz_localize("America/Sao_Paulo")
+    return timestamp.tz_convert("UTC")
+
+def format_xano_timestamp(value):
+    timestamp = parse_xano_timestamp_utc(value)
+    if pd.isna(timestamp):
+        return "—"
+    return timestamp.tz_convert("America/Sao_Paulo").strftime("%d/%m/%Y %H:%M:%S")
+
+def format_stay_duration(entry_time, exit_time):
+    entry = parse_xano_timestamp_utc(entry_time)
+    exit = parse_xano_timestamp_utc(exit_time)
+    if pd.isna(entry) or pd.isna(exit) or exit < entry:
+        return None
+
+    total_seconds = int((exit - entry).total_seconds())
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours}h {minutes}min {seconds}s"
+
 # --- TELA DE LOGIN ---
 if not st.session_state.logged_in:
     col1, col2, col3 = st.columns([1, 1.2, 1])
@@ -439,17 +471,9 @@ else:
                 )
                 df_hist['amount_numeric'] = pd.to_numeric(df_hist['amount'], errors='coerce')
 
-                def parse_xano_timestamp(value):
-                    if pd.isna(value):
-                        return pd.NaT
-                    timestamp = pd.to_numeric(value, errors='coerce')
-                    if pd.notna(timestamp):
-                        return pd.to_datetime(timestamp, unit='ms', errors='coerce', utc=True)
-                    return pd.to_datetime(value, errors='coerce', utc=True)
-
                 for column in ('entry_time', 'exit_time'):
                     df_hist[f'{column}_parsed'] = pd.to_datetime(
-                        df_hist[column].map(parse_xano_timestamp),
+                        df_hist[column].map(parse_xano_timestamp_utc),
                         errors='coerce',
                         utc=True
                     ).dt.tz_convert("America/Sao_Paulo")
@@ -460,10 +484,10 @@ else:
                 df_display['plate'] = df_display['plate'].astype('string').fillna('—')
                 df_display['vaga_number'] = df_display['vaga_number'].astype('string').fillna('—')
                 df_display['entry_time_parsed'] = (
-                    df_display['entry_time_parsed'].dt.strftime('%d/%m/%Y %H:%M').fillna('—')
+                    df_display['entry_time_parsed'].dt.strftime('%d/%m/%Y %H:%M:%S').fillna('—')
                 )
                 df_display['exit_time_parsed'] = (
-                    df_display['exit_time_parsed'].dt.strftime('%d/%m/%Y %H:%M').fillna('—')
+                    df_display['exit_time_parsed'].dt.strftime('%d/%m/%Y %H:%M:%S').fillna('—')
                 )
                 df_display['amount_numeric'] = df_display['amount_numeric'].map(
                     lambda value: f"R$ {value:.2f}".replace('.', ',') if pd.notna(value) else '—'
@@ -555,6 +579,13 @@ else:
                 ler = st.session_state["last_exit_result"]
                 st.success("Saída registrada com sucesso!")
                 st.info(f"**Placa do Veículo:** {ler.get('plate')} | **Vaga Liberada:** #{ler.get('vaga_number')}")
+                if ler.get("entry_time") is not None:
+                    st.write(f"**Entrada:** {format_xano_timestamp(ler.get('entry_time'))}")
+                if ler.get("exit_time") is not None:
+                    st.write(f"**Saída:** {format_xano_timestamp(ler.get('exit_time'))}")
+                stay_duration = format_stay_duration(ler.get("entry_time"), ler.get("exit_time"))
+                if stay_duration is not None:
+                    st.write(f"**Tempo de permanência:** {stay_duration}")
                 amount = ler.get('amount')
                 if amount is None:
                     st.warning("Valor a Pagar: Valor não informado")
@@ -574,22 +605,25 @@ else:
                     mov_id = None
                     m_plate = None
                     m_vaga_number = None
+                    m_entry_time = None
                 elif not movs_abertas:
                     st.info("Nenhum veículo estacionado no momento.")
                     mov_id = None
                     m_plate = None
                     m_vaga_number = None
+                    m_entry_time = None
                 else:
                     mov_options = {
-                        f"Placa: {m.get('plate')} | Vaga #{m.get('vaga_number')} (Entrada: {m.get('entry_time')})": (
+                        f"Placa: {m.get('plate')} | Vaga #{m.get('vaga_number')} (Entrada: {format_xano_timestamp(m.get('entry_time'))})": (
                             m.get('movimentacao_id'),
                             m.get('plate'),
-                            m.get('vaga_number')
+                            m.get('vaga_number'),
+                            m.get('entry_time')
                         )
                         for m in movs_abertas
                     }
                     selected_mov_label = st.selectbox("Selecione o Veículo Estacionado", list(mov_options.keys()))
-                    mov_id, m_plate, m_vaga_number = mov_options[selected_mov_label]
+                    mov_id, m_plate, m_vaga_number, m_entry_time = mov_options[selected_mov_label]
 
                 st.markdown("<br><br>", unsafe_allow_html=True)
                 submit_saida = st.form_submit_button("Registrar Saída", use_container_width=True)
@@ -610,6 +644,8 @@ else:
                                 "mov_id": mov_id,
                                 "plate": m_plate,
                                 "vaga_number": vaga_res.get("number", m_vaga_number),
+                                "entry_time": mov_res.get("entry_time") or m_entry_time,
+                                "exit_time": mov_res.get("exit_time"),
                                 "amount": mov_res.get("amount")
                             }
                             if "last_entry_result" in st.session_state:
